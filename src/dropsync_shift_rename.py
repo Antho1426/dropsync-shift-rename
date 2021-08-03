@@ -203,7 +203,7 @@ def rename_files(list_of_file_paths: list, type: str) -> list:
                     renamed_list_of_file_paths.append(file_path_new)
                     os.rename(file_path, file_path_new)
                 else:
-                    print(colored('⚠️ Warning!\n', 'red'), '  WhatsApp files have already been renamed!')
+                    print(colored('⚠️  Warning!\n', 'red'), '  WhatsApp files have already been renamed!')
                     renamed_list_of_file_paths.append(file_path)
 
         elif type == TELEGRAM_TYPE:
@@ -232,7 +232,7 @@ def rename_files(list_of_file_paths: list, type: str) -> list:
                 os.rename(file_path, file_path_new)
 
     else:
-        print(colored('⚠️ Warning!\n', 'red'), '  The list of files to rename is empty!')
+        print(colored('⚠️  Warning!\n', 'red'), '  The list of files to rename is empty!')
 
     return renamed_list_of_file_paths
 
@@ -304,7 +304,7 @@ def convert_to_mp3(list_of_audio_paths: list) -> list:
             # Appending the audio file path to "list_of_audio_paths_mp3"
             list_of_audio_paths_mp3.append(audio_path_mp3)
     else:
-        print(colored('⚠️ Warning!\n', 'red'), '  The list of files to convert to ".mp3" is empty!')
+        print(colored('⚠️  Warning!\n', 'red'), '  The list of files to convert to ".mp3" is empty!')
 
     return list_of_audio_paths_mp3
 
@@ -370,140 +370,158 @@ untargeted_folders_list = [
 
 ## A) "WhatsApp Images"
 print(' A) "WhatsApp Images"')
-# A.1) Renaming "WhatsApp Images" file names
-print('  A.1) Renaming "WhatsApp Images" file names')
-extensions = ['*.jpg', '*.jpeg']
-list_of_img_paths = []
-for ext in extensions:
-    list_of_img_paths += glob.glob(WHATSAPP_IMAGES_PATH + ext)
-renamed_list_of_img_paths = rename_files(list_of_img_paths, WHATSAPP_TYPE)
-if len(renamed_list_of_img_paths) == 0:
-    RETURNED_MESSAGE += '\n • WhatsApp Images'
+if os.path.isdir(WHATSAPP_IMAGES_PATH):
+    # A.1) Renaming "WhatsApp Images" file names
+    print('  A.1) Renaming "WhatsApp Images" file names')
+    extensions = ['*.jpg', '*.jpeg']
+    list_of_img_paths = []
+    for ext in extensions:
+        list_of_img_paths += glob.glob(WHATSAPP_IMAGES_PATH + ext)
+    renamed_list_of_img_paths = rename_files(list_of_img_paths, WHATSAPP_TYPE)
+    if len(renamed_list_of_img_paths) == 0:
+        RETURNED_MESSAGE += '\n • WhatsApp Images'
+        NB_EMPTY_FOLDERS += 1
+    # A.2) Emptying "Sent" folder
+    print('  A.2) Emptying "Sent" folder')
+    empty_folder(WHATSAPP_IMAGES_PATH + SENT_FOLDER)
+    # A.3) Emptying "Private" folder
+    print('  A.3) Emptying "Private" folder')
+    empty_folder(WHATSAPP_IMAGES_PATH + PRIVATE_FOLDER)
+    # A.4) Moving the files to the "Camera Uploads" folder
+    print('  A.4) Moving the files to the "Camera Uploads" folder')
+    move_files(renamed_list_of_img_paths, CAMERA_UPLOADS_PATH)
+else:
     NB_EMPTY_FOLDERS += 1
-# A.2) Emptying "Sent" folder
-print('  A.2) Emptying "Sent" folder')
-empty_folder(WHATSAPP_IMAGES_PATH + SENT_FOLDER)
-# A.3) Emptying "Private" folder
-print('  A.3) Emptying "Private" folder')
-empty_folder(WHATSAPP_IMAGES_PATH + PRIVATE_FOLDER)
-# A.4) Moving the files to the "Camera Uploads" folder
-print('  A.4) Moving the files to the "Camera Uploads" folder')
-move_files(renamed_list_of_img_paths, CAMERA_UPLOADS_PATH)
 
 ## B) "WhatsApp Video"
 print(' B) "WhatsApp Video"')
-# B.1) Renaming "WhatsApp Video" file names
-print('  B.1) Renaming "WhatsApp Video" file names')
-list_of_vid_paths = glob.glob(WHATSAPP_VIDEOS_PATH + '*.mp4')
-renamed_list_of_vid_paths = rename_files(list_of_vid_paths, WHATSAPP_TYPE)
-if len(renamed_list_of_vid_paths) == 0:
-    RETURNED_MESSAGE += '\n • WhatsApp Video'
+if os.path.isdir(WHATSAPP_VIDEOS_PATH):
+    # B.1) Renaming "WhatsApp Video" file names
+    print('  B.1) Renaming "WhatsApp Video" file names')
+    list_of_vid_paths = glob.glob(WHATSAPP_VIDEOS_PATH + '*.mp4')
+    renamed_list_of_vid_paths = rename_files(list_of_vid_paths, WHATSAPP_TYPE)
+    if len(renamed_list_of_vid_paths) == 0:
+        RETURNED_MESSAGE += '\n • WhatsApp Video'
+        NB_EMPTY_FOLDERS += 1
+    # B.2) Emptying "Sent" folder
+    print('  B.2) Emptying "Sent" folder')
+    empty_folder(WHATSAPP_VIDEOS_PATH + SENT_FOLDER)
+    # B.3) Emptying "Private" folder
+    print('  B.3) Emptying "Private" folder')
+    empty_folder(WHATSAPP_VIDEOS_PATH + PRIVATE_FOLDER)
+    # B.4) Moving the files to the "Camera Uploads" folder
+    print('  B.4) Moving the files to the "Camera Uploads" folder')
+    move_files(renamed_list_of_vid_paths, CAMERA_UPLOADS_PATH)
+else:
     NB_EMPTY_FOLDERS += 1
-# B.2) Emptying "Sent" folder
-print('  B.2) Emptying "Sent" folder')
-empty_folder(WHATSAPP_VIDEOS_PATH + SENT_FOLDER)
-# B.3) Emptying "Private" folder
-print('  B.3) Emptying "Private" folder')
-empty_folder(WHATSAPP_VIDEOS_PATH + PRIVATE_FOLDER)
-# B.4) Moving the files to the "Camera Uploads" folder
-print('  B.4) Moving the files to the "Camera Uploads" folder')
-move_files(renamed_list_of_vid_paths, CAMERA_UPLOADS_PATH)
 
 ## C) "WhatsApp Stickers"
 print(' C) "WhatsApp Stickers"')
-list_of_sticker_paths = glob.glob(WHATSAPP_STICKERS_PATH + '*.webp')
-for sticker_path in list_of_sticker_paths:
-    # C.1) Converting sticker from ".webp" to ".png"
-    print('  C.1) Converting sticker from ".webp" to ".png"')
-    # (Cf. "Image Conversion (JPG ⇄ PNG/JPG ⇄ WEBP) with Python",
-    # https://medium.com/@ajeet214/image-type-conversion-jpg-png-jpg-webp-png-webp-with-python-7d5df09394c9)
-    im = Image.open(sticker_path).convert('RGBA')
-    im.save(sticker_path.replace('.webp','.png'), 'png')
-    # C.2) Deleting ".webp" sticker
-    print('  C.2) Deleting ".webp" sticker')
-    os.remove(sticker_path)
-# C.3) Renaming PNG "WhatsApp Stickers" file names
-print('  C.3) Renaming PNG "WhatsApp Stickers" file names')
-list_of_sticker_png_paths = glob.glob(WHATSAPP_STICKERS_PATH + '*.png')
-renamed_list_of_sticker_paths = rename_files(list_of_sticker_png_paths, WHATSAPP_TYPE)
-if len(renamed_list_of_sticker_paths) == 0:
-    RETURNED_MESSAGE += '\n • WhatsApp Stickers'
+if os.path.isdir(WHATSAPP_STICKERS_PATH):
+    list_of_sticker_paths = glob.glob(WHATSAPP_STICKERS_PATH + '*.webp')
+    for sticker_path in list_of_sticker_paths:
+        # C.1) Converting sticker from ".webp" to ".png"
+        print('  C.1) Converting sticker from ".webp" to ".png"')
+        # (Cf. "Image Conversion (JPG ⇄ PNG/JPG ⇄ WEBP) with Python",
+        # https://medium.com/@ajeet214/image-type-conversion-jpg-png-jpg-webp-png-webp-with-python-7d5df09394c9)
+        im = Image.open(sticker_path).convert('RGBA')
+        im.save(sticker_path.replace('.webp','.png'), 'png')
+        # C.2) Deleting ".webp" sticker
+        print('  C.2) Deleting ".webp" sticker')
+        os.remove(sticker_path)
+    # C.3) Renaming PNG "WhatsApp Stickers" file names
+    print('  C.3) Renaming PNG "WhatsApp Stickers" file names')
+    list_of_sticker_png_paths = glob.glob(WHATSAPP_STICKERS_PATH + '*.png')
+    renamed_list_of_sticker_paths = rename_files(list_of_sticker_png_paths, WHATSAPP_TYPE)
+    if len(renamed_list_of_sticker_paths) == 0:
+        RETURNED_MESSAGE += '\n • WhatsApp Stickers'
+        NB_EMPTY_FOLDERS += 1
+    # C.4) Moving the files to the "Camera Uploads" folder
+    print('  C.4) Moving the files to the "Camera Uploads" folder')
+    move_files(renamed_list_of_sticker_paths, CAMERA_UPLOADS_PATH)
+else:
     NB_EMPTY_FOLDERS += 1
-# C.4) Moving the files to the "Camera Uploads" folder
-print('  C.4) Moving the files to the "Camera Uploads" folder')
-move_files(renamed_list_of_sticker_paths, CAMERA_UPLOADS_PATH)
 
 ## D) "WhatsApp Audio"
 print(' D) "WhatsApp Audio"')
-# D.1) Shifting all files from the "Sent" directory in the "WhatsApp Audio" directory
-print('  D.1) Shifting all files from the "Sent" directory in the "WhatsApp Audio" directory')
-files_in_sent = [WHATSAPP_AUDIO_PATH+SENT_FOLDER+SLASH_SIGN+f for f in listdir(WHATSAPP_AUDIO_PATH+SENT_FOLDER+SLASH_SIGN) if isfile(join(WHATSAPP_AUDIO_PATH+SENT_FOLDER+SLASH_SIGN, f))]
-move_files(files_in_sent, WHATSAPP_AUDIO_PATH)
-# D.2) Getting all files in "WhatsApp Audio" directory (".opus", ".mp3", ".m4a", etc.)
-print('  D.2) Getting all files in "WhatsApp Audio" directory (".opus", ".mp3", ".m4a", etc.)')
-files_in_whatsapp_audio = [f for f in listdir(WHATSAPP_AUDIO_PATH) if isfile(join(WHATSAPP_AUDIO_PATH, f))]
-# D.3) Removing hidden files from list of files to convert
-print('  D.3) Removing hidden files from list of files to convert')
-files_in_whatsapp_audio = [f for f in files_in_whatsapp_audio if not(f.startswith('.'))]
-# D.4) Listing all paths of audio files
-print('  D.4) Listing all paths of audio files')
-list_of_audio_paths = [WHATSAPP_AUDIO_PATH+f for f in files_in_whatsapp_audio]
-# D.5) Renaming "WhatsApp Audio" file names
-print('  D.5) Renaming "WhatsApp Audio" file names')
-renamed_list_of_audio_paths = rename_files(list_of_audio_paths, WHATSAPP_TYPE)
-if len(renamed_list_of_audio_paths) == 0:
-    RETURNED_MESSAGE += '\n • WhatsApp Audio'
+if os.path.isdir(WHATSAPP_AUDIO_PATH):
+    # D.1) Shifting all files from the "Sent" directory in the "WhatsApp Audio" directory
+    print('  D.1) Shifting all files from the "Sent" directory in the "WhatsApp Audio" directory')
+    files_in_sent = [WHATSAPP_AUDIO_PATH+SENT_FOLDER+SLASH_SIGN+f for f in listdir(WHATSAPP_AUDIO_PATH+SENT_FOLDER+SLASH_SIGN) if isfile(join(WHATSAPP_AUDIO_PATH+SENT_FOLDER+SLASH_SIGN, f))]
+    move_files(files_in_sent, WHATSAPP_AUDIO_PATH)
+    # D.2) Getting all files in "WhatsApp Audio" directory (".opus", ".mp3", ".m4a", etc.)
+    print('  D.2) Getting all files in "WhatsApp Audio" directory (".opus", ".mp3", ".m4a", etc.)')
+    files_in_whatsapp_audio = [f for f in listdir(WHATSAPP_AUDIO_PATH) if isfile(join(WHATSAPP_AUDIO_PATH, f))]
+    # D.3) Removing hidden files from list of files to convert
+    print('  D.3) Removing hidden files from list of files to convert')
+    files_in_whatsapp_audio = [f for f in files_in_whatsapp_audio if not(f.startswith('.'))]
+    # D.4) Listing all paths of audio files
+    print('  D.4) Listing all paths of audio files')
+    list_of_audio_paths = [WHATSAPP_AUDIO_PATH+f for f in files_in_whatsapp_audio]
+    # D.5) Renaming "WhatsApp Audio" file names
+    print('  D.5) Renaming "WhatsApp Audio" file names')
+    renamed_list_of_audio_paths = rename_files(list_of_audio_paths, WHATSAPP_TYPE)
+    if len(renamed_list_of_audio_paths) == 0:
+        RETURNED_MESSAGE += '\n • WhatsApp Audio'
+        NB_EMPTY_FOLDERS += 1
+    # D.6) Removing ".mp3" files from list of files to convert
+    print('  D.6) Removing ".mp3" files from list of files to convert')
+    list_of_audio_paths_already_mp3 = [f for f in renamed_list_of_audio_paths if f.endswith('.mp3')]
+    list_of_audio_paths_no_mp3 = [f for f in renamed_list_of_audio_paths if f not in list_of_audio_paths_already_mp3]
+    # D.7) Converting audio files to mp3
+    print('  D.7) Converting audio files to mp3')
+    list_of_audio_paths_mp3 = convert_to_mp3(list_of_audio_paths_no_mp3) + list_of_audio_paths_already_mp3
+    # D.8) Moving the files to the "Camera Uploads" folder
+    print('  D.8) Moving the files to the "Camera Uploads" folder')
+    move_files(list_of_audio_paths_mp3, CAMERA_UPLOADS_PATH)
+else:
     NB_EMPTY_FOLDERS += 1
-# D.6) Removing ".mp3" files from list of files to convert
-print('  D.6) Removing ".mp3" files from list of files to convert')
-list_of_audio_paths_already_mp3 = [f for f in renamed_list_of_audio_paths if f.endswith('.mp3')]
-list_of_audio_paths_no_mp3 = [f for f in renamed_list_of_audio_paths if f not in list_of_audio_paths_already_mp3]
-# D.7) Converting audio files to mp3
-print('  D.7) Converting audio files to mp3')
-list_of_audio_paths_mp3 = convert_to_mp3(list_of_audio_paths_no_mp3) + list_of_audio_paths_already_mp3
-# D.8) Moving the files to the "Camera Uploads" folder
-print('  D.8) Moving the files to the "Camera Uploads" folder')
-move_files(list_of_audio_paths_mp3, CAMERA_UPLOADS_PATH)
 
 ## E) "WhatsApp Voice Notes"
 print(' E) "WhatsApp Voice Notes"')
-# E.1) Gathering all (".opus") files of the different subfolders
-print('  E.1) Gathering all (".opus") files of the different subfolders')
-list_of_files_in_subfolders = get_list_of_files(WHATSAPP_VOICE_NOTES_PATH)
-# E.2) Moving all (".opus") files at the root of the "WhatsApp Voice Notes" folder
-print('  E.2) Moving all (".opus") files at the root of the "WhatsApp Voice Notes" folder')
-move_files(list_of_files_in_subfolders, WHATSAPP_VOICE_NOTES_PATH)
-# E.3) Deleting the emptied folders
-print('  E.3) Deleting the emptied folders')
-folders_list = [WHATSAPP_VOICE_NOTES_PATH+f for f in os.listdir(WHATSAPP_VOICE_NOTES_PATH) if os.path.isdir(WHATSAPP_VOICE_NOTES_PATH+f)]
-for f in folders_list:
-    os.rmdir(f)
-# E.4) Renaming "WhatsApp Voice Notes" file names
-print('  E.4) Renaming "WhatsApp Voice Notes" file names')
-list_of_files_in_whatsapp_voice_notes = ['/'.join(f.split('/')[:-2])+SLASH_SIGN+f.split('/')[-1] for f in list_of_files_in_subfolders]
-renamed_list_of_files = rename_files(list_of_files_in_whatsapp_voice_notes, WHATSAPP_TYPE)
-if len(renamed_list_of_files) == 0:
-    RETURNED_MESSAGE += '\n • WhatsApp Voice Notes'
+if os.path.isdir(WHATSAPP_VOICE_NOTES_PATH):
+    # E.1) Gathering all (".opus") files of the different subfolders
+    print('  E.1) Gathering all (".opus") files of the different subfolders')
+    list_of_files_in_subfolders = get_list_of_files(WHATSAPP_VOICE_NOTES_PATH)
+    # E.2) Moving all (".opus") files at the root of the "WhatsApp Voice Notes" folder
+    print('  E.2) Moving all (".opus") files at the root of the "WhatsApp Voice Notes" folder')
+    move_files(list_of_files_in_subfolders, WHATSAPP_VOICE_NOTES_PATH)
+    # E.3) Deleting the emptied folders
+    print('  E.3) Deleting the emptied folders')
+    folders_list = [WHATSAPP_VOICE_NOTES_PATH+f for f in os.listdir(WHATSAPP_VOICE_NOTES_PATH) if os.path.isdir(WHATSAPP_VOICE_NOTES_PATH+f)]
+    for f in folders_list:
+        os.rmdir(f)
+    # E.4) Renaming "WhatsApp Voice Notes" file names
+    print('  E.4) Renaming "WhatsApp Voice Notes" file names')
+    list_of_files_in_whatsapp_voice_notes = ['/'.join(f.split('/')[:-2])+SLASH_SIGN+f.split('/')[-1] for f in list_of_files_in_subfolders]
+    renamed_list_of_files = rename_files(list_of_files_in_whatsapp_voice_notes, WHATSAPP_TYPE)
+    if len(renamed_list_of_files) == 0:
+        RETURNED_MESSAGE += '\n • WhatsApp Voice Notes'
+        NB_EMPTY_FOLDERS += 1
+    # E.5) Converting audio files to mp3
+    print('  E.5) Converting audio files to mp3')
+    list_of_files_mp3 = convert_to_mp3(renamed_list_of_files)
+    # E.6) Moving the files to the "Camera Uploads" folder
+    print('  E.6) Moving the files to the "Camera Uploads" folder')
+    move_files(list_of_files_mp3, CAMERA_UPLOADS_PATH)
+else:
     NB_EMPTY_FOLDERS += 1
-# E.5) Converting audio files to mp3
-print('  E.5) Converting audio files to mp3')
-list_of_files_mp3 = convert_to_mp3(renamed_list_of_files)
-# E.6) Moving the files to the "Camera Uploads" folder
-print('  E.6) Moving the files to the "Camera Uploads" folder')
-move_files(list_of_files_mp3, CAMERA_UPLOADS_PATH)
 
 ## F) "WhatsApp Animated Gifs"
 print(' F) "WhatsApp Animated Gifs"')
-# F.1) Renaming "WhatsApp Animated Gifs" file names
-print('  F.1) Renaming "WhatsApp Animated Gifs" file names')
-list_of_anim_gifs_paths = glob.glob(WHATSAPP_ANIMATED_GIFS_PATH + '*.mp4')
-renamed_list_of_anim_gifs_paths = rename_files(list_of_anim_gifs_paths, WHATSAPP_TYPE)
-if len(renamed_list_of_anim_gifs_paths) == 0:
-    RETURNED_MESSAGE += '\n • WhatsApp Animated Gifs'
+if os.path.isdir(WHATSAPP_ANIMATED_GIFS_PATH):
+    # F.1) Renaming "WhatsApp Animated Gifs" file names
+    print('  F.1) Renaming "WhatsApp Animated Gifs" file names')
+    list_of_anim_gifs_paths = glob.glob(WHATSAPP_ANIMATED_GIFS_PATH + '*.mp4')
+    renamed_list_of_anim_gifs_paths = rename_files(list_of_anim_gifs_paths, WHATSAPP_TYPE)
+    if len(renamed_list_of_anim_gifs_paths) == 0:
+        RETURNED_MESSAGE += '\n • WhatsApp Animated Gifs'
+        NB_EMPTY_FOLDERS += 1
+    # F.2) Moving the files to the "Camera Uploads" folder
+    print('  F.2) Moving the files to the "Camera Uploads" folder')
+    move_files(renamed_list_of_anim_gifs_paths, CAMERA_UPLOADS_PATH)
+else:
     NB_EMPTY_FOLDERS += 1
-# F.2) Moving the files to the "Camera Uploads" folder
-print('  F.2) Moving the files to the "Camera Uploads" folder')
-move_files(renamed_list_of_anim_gifs_paths, CAMERA_UPLOADS_PATH)
 
 ## G) Empty untargeted folders
 for folder_path in untargeted_folders_list:
@@ -670,7 +688,7 @@ if NB_EMPTY_FOLDERS > 0:
 if NB_EMPTY_FOLDERS == 10:
     notify(title='dropsync_shift_rename.py',
            subtitle='⚠️️ Process aborted!',
-           message='→ There are no files to move from DropsyncFiles to Camera Uploads!',
+           message='→ There are currently no files to move from DropsyncFiles to Camera Uploads!',
            sound='Sosumi')
 else:
     notify(title='dropsync_shift_rename.py',
