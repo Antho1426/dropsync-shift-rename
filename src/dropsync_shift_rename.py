@@ -9,7 +9,7 @@
 
 
 #====================
-DEBUG_MODE_ON = True
+DEBUG_MODE_ON = False
 #====================
 
 
