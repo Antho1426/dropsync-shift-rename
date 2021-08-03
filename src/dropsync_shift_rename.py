@@ -9,7 +9,7 @@
 
 
 #====================
-DEBUG_MODE_ON = False
+DEBUG_MODE_ON = True
 #====================
 
 
@@ -17,8 +17,7 @@ DEBUG_MODE_ON = False
 
 ## Setting the current working directory automatically
 import os
-#project_path = os.getcwd() # getting the path leading to the current working directory
-project_path = '/Users/anthony/MEGA/DOCUMENTS/Programmation/Python/MyPythonProjects/DropsyncShiftAndRename'
+project_path = os.getcwd() # getting the path leading to the current working directory
 os.getcwd() # printing the path leading to the current working directory
 os.chdir(project_path) # setting the current working directory based on the path leading to the current working directory
 
@@ -66,6 +65,10 @@ SNAPCHAT_TYPE: str = 'Snapchat'
 CLOUD_MUSIC_TYPE: str = 'CLOUD_MUSIC'
 VIDMATE_TYPE: str = 'VidMate'
 WHATSAPP_SHORT: str = 'WA'
+DROPSYNCFILES_DIRECTORY_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles'
+CAMERA_UPLOADS_DIRECTORY_PATH: str = '/Users/anthony/Dropbox/Camera Uploads'
+RETURNED_MESSAGE: str = '\n⚠️ List of empty folders (i.e. that currently do not contain files to be moved):'
+NB_EMPTY_FOLDERS: int = 0
 
 
 
@@ -339,13 +342,13 @@ if DEBUG_MODE_ON:
     WHATSAPP_VOICE_NOTES_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Voice Notes/test_files/'
     CAMERA_UPLOADS_PATH: str = project_path + '/tests/Camera Uploads/'
 else:
-    WHATSAPP_ANIMATED_GIFS_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles/WhatsApp/WhatsApp Animated Gifs/'
-    WHATSAPP_AUDIO_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles/WhatsApp/WhatsApp Audio/'
-    WHATSAPP_IMAGES_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles/WhatsApp/WhatsApp Images/'
-    WHATSAPP_STICKERS_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles/WhatsApp/WhatsApp Stickers/'
-    WHATSAPP_VIDEOS_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles/WhatsApp/WhatsApp Video/'
-    WHATSAPP_VOICE_NOTES_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles/WhatsApp/WhatsApp Voice Notes/'
-    CAMERA_UPLOADS_PATH: str = '/Users/anthony/Dropbox/Camera Uploads/'
+    WHATSAPP_ANIMATED_GIFS_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/WhatsApp/WhatsApp Animated Gifs/'
+    WHATSAPP_AUDIO_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/WhatsApp/WhatsApp Audio/'
+    WHATSAPP_IMAGES_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/WhatsApp/WhatsApp Images/'
+    WHATSAPP_STICKERS_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/WhatsApp/WhatsApp Stickers/'
+    WHATSAPP_VIDEOS_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/WhatsApp/WhatsApp Video/'
+    WHATSAPP_VOICE_NOTES_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/WhatsApp/WhatsApp Voice Notes/'
+    CAMERA_UPLOADS_PATH: str = CAMERA_UPLOADS_DIRECTORY_PATH
 
 # Untargeted folder paths
 if DEBUG_MODE_ON:
@@ -354,10 +357,10 @@ if DEBUG_MODE_ON:
     WHATSAPP_DOCUMENTS_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Documents/test_files/'
     WHATSAPP_PROFILE_PHOTOS_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Profile Photos/test_files/'
 else:
-    WHATSAPP_MISC_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles/WhatsApp/MISC/'
-    WHATSAPP_WALLPAPER_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles/WhatsApp/WallPaper/'
-    WHATSAPP_DOCUMENTS_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles/WhatsApp/WhatsApp Documents/'
-    WHATSAPP_PROFILE_PHOTOS_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles/WhatsApp/WhatsApp Profile Photos/'
+    WHATSAPP_MISC_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/WhatsApp/MISC/'
+    WHATSAPP_WALLPAPER_PATH: str = '/WhatsApp/WallPaper/'
+    WHATSAPP_DOCUMENTS_PATH: str = '/WhatsApp/WhatsApp Documents/'
+    WHATSAPP_PROFILE_PHOTOS_PATH: str = '/WhatsApp/WhatsApp Profile Photos/'
 untargeted_folders_list = [
     WHATSAPP_MISC_PATH,
     WHATSAPP_WALLPAPER_PATH,
@@ -374,6 +377,9 @@ list_of_img_paths = []
 for ext in extensions:
     list_of_img_paths += glob.glob(WHATSAPP_IMAGES_PATH + ext)
 renamed_list_of_img_paths = rename_files(list_of_img_paths, WHATSAPP_TYPE)
+if len(renamed_list_of_img_paths) == 0:
+    RETURNED_MESSAGE += '\n • WhatsApp Images'
+    NB_EMPTY_FOLDERS += 1
 # A.2) Emptying "Sent" folder
 print('  A.2) Emptying "Sent" folder')
 empty_folder(WHATSAPP_IMAGES_PATH + SENT_FOLDER)
@@ -390,6 +396,9 @@ print(' B) "WhatsApp Video"')
 print('  B.1) Renaming "WhatsApp Video" file names')
 list_of_vid_paths = glob.glob(WHATSAPP_VIDEOS_PATH + '*.mp4')
 renamed_list_of_vid_paths = rename_files(list_of_vid_paths, WHATSAPP_TYPE)
+if len(renamed_list_of_vid_paths) == 0:
+    RETURNED_MESSAGE += '\n • WhatsApp Video'
+    NB_EMPTY_FOLDERS += 1
 # B.2) Emptying "Sent" folder
 print('  B.2) Emptying "Sent" folder')
 empty_folder(WHATSAPP_VIDEOS_PATH + SENT_FOLDER)
@@ -417,6 +426,9 @@ for sticker_path in list_of_sticker_paths:
 print('  C.3) Renaming PNG "WhatsApp Stickers" file names')
 list_of_sticker_png_paths = glob.glob(WHATSAPP_STICKERS_PATH + '*.png')
 renamed_list_of_sticker_paths = rename_files(list_of_sticker_png_paths, WHATSAPP_TYPE)
+if len(renamed_list_of_sticker_paths) == 0:
+    RETURNED_MESSAGE += '\n • WhatsApp Stickers'
+    NB_EMPTY_FOLDERS += 1
 # C.4) Moving the files to the "Camera Uploads" folder
 print('  C.4) Moving the files to the "Camera Uploads" folder')
 move_files(renamed_list_of_sticker_paths, CAMERA_UPLOADS_PATH)
@@ -439,6 +451,9 @@ list_of_audio_paths = [WHATSAPP_AUDIO_PATH+f for f in files_in_whatsapp_audio]
 # D.5) Renaming "WhatsApp Audio" file names
 print('  D.5) Renaming "WhatsApp Audio" file names')
 renamed_list_of_audio_paths = rename_files(list_of_audio_paths, WHATSAPP_TYPE)
+if len(renamed_list_of_audio_paths) == 0:
+    RETURNED_MESSAGE += '\n • WhatsApp Audio'
+    NB_EMPTY_FOLDERS += 1
 # D.6) Removing ".mp3" files from list of files to convert
 print('  D.6) Removing ".mp3" files from list of files to convert')
 list_of_audio_paths_already_mp3 = [f for f in renamed_list_of_audio_paths if f.endswith('.mp3')]
@@ -467,6 +482,9 @@ for f in folders_list:
 print('  E.4) Renaming "WhatsApp Voice Notes" file names')
 list_of_files_in_whatsapp_voice_notes = ['/'.join(f.split('/')[:-2])+SLASH_SIGN+f.split('/')[-1] for f in list_of_files_in_subfolders]
 renamed_list_of_files = rename_files(list_of_files_in_whatsapp_voice_notes, WHATSAPP_TYPE)
+if len(renamed_list_of_files) == 0:
+    RETURNED_MESSAGE += '\n • WhatsApp Voice Notes'
+    NB_EMPTY_FOLDERS += 1
 # E.5) Converting audio files to mp3
 print('  E.5) Converting audio files to mp3')
 list_of_files_mp3 = convert_to_mp3(renamed_list_of_files)
@@ -480,6 +498,9 @@ print(' F) "WhatsApp Animated Gifs"')
 print('  F.1) Renaming "WhatsApp Animated Gifs" file names')
 list_of_anim_gifs_paths = glob.glob(WHATSAPP_ANIMATED_GIFS_PATH + '*.mp4')
 renamed_list_of_anim_gifs_paths = rename_files(list_of_anim_gifs_paths, WHATSAPP_TYPE)
+if len(renamed_list_of_anim_gifs_paths) == 0:
+    RETURNED_MESSAGE += '\n • WhatsApp Animated Gifs'
+    NB_EMPTY_FOLDERS += 1
 # F.2) Moving the files to the "Camera Uploads" folder
 print('  F.2) Moving the files to the "Camera Uploads" folder')
 move_files(renamed_list_of_anim_gifs_paths, CAMERA_UPLOADS_PATH)
@@ -504,7 +525,7 @@ print('-----------')
 if DEBUG_MODE_ON:
     TELEGRAM_PATH: str = project_path + '/tests/Telegram/test_files/'
 else:
-    TELEGRAM_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles/Telegram/'
+    TELEGRAM_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/Telegram/'
 TELEGRAM_IMAGES_PATH: str = TELEGRAM_PATH + 'Telegram Images/'
 
 ## A) Emptying all folders apart from "Telegram Images"
@@ -522,6 +543,9 @@ print(' B) "Telegram Images"')
 print('  B.1) Renaming "Telegram Images" file names')
 list_of_img_paths = glob.glob(TELEGRAM_IMAGES_PATH + "/*.jpg")
 renamed_list_of_img_paths = rename_files(list_of_img_paths, TELEGRAM_TYPE)
+if len(renamed_list_of_img_paths) == 0:
+    RETURNED_MESSAGE += '\n • Telegram Images'
+    NB_EMPTY_FOLDERS += 1
 # B.2) Moving the files to the "Camera Uploads" folder
 print('  B.2) Moving the files to the "Camera Uploads" folder')
 move_files(renamed_list_of_img_paths, CAMERA_UPLOADS_PATH)
@@ -542,7 +566,7 @@ print('-----------')
 if DEBUG_MODE_ON:
     SNAPCHAT_PATH: str = project_path + '/tests/Snapchat/test_files/'
 else:
-    SNAPCHAT_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles/Snapchat/'
+    SNAPCHAT_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/Snapchat/'
 
 ## A) Renaming "Snapchat" file names
 print(' A) Renaming "Snapchat" file names')
@@ -551,6 +575,9 @@ list_of_file_paths = []
 for ext in extensions:
     list_of_file_paths += glob.glob(SNAPCHAT_PATH + ext)
 renamed_list_of_file_paths = rename_files(list_of_file_paths, SNAPCHAT_TYPE)
+if len(renamed_list_of_file_paths) == 0:
+    RETURNED_MESSAGE += '\n • Snapchat'
+    NB_EMPTY_FOLDERS += 1
 
 ## B) Moving the files to the "Camera Uploads" folder
 print(' B) Moving the files to the "Camera Uploads" folder')
@@ -573,7 +600,7 @@ print('--------------')
 if DEBUG_MODE_ON:
     CLOUD_MUSIC_PATH: str = project_path + '/tests/CLOUD_MUSIC/test_files'
 else:
-    CLOUD_MUSIC_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles/CLOUD_MUSIC'
+    CLOUD_MUSIC_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/CLOUD_MUSIC/'
 
 ## A) Converting the audio files from ".m4a" to ".mp3"
 print(' A) Converting the audio files from ".m4a" to ".mp3"')
@@ -583,6 +610,9 @@ list_of_files_mp3 = convert_to_mp3(list_of_audio_paths)
 ## B) Renaming the audio files
 print(' B) Renaming the audio files')
 renamed_list_of_mp3_paths = rename_files(list_of_files_mp3, CLOUD_MUSIC_TYPE)
+if len(renamed_list_of_mp3_paths) == 0:
+    RETURNED_MESSAGE += '\n • CLOUD_MUSIC'
+    NB_EMPTY_FOLDERS += 1
 
 ## C) Moving the files to the "Camera Uploads" folder
 print(' C) Moving the files to the "Camera Uploads" folder')
@@ -605,7 +635,7 @@ print('----------')
 if DEBUG_MODE_ON:
     VIDMATE_PATH: str = project_path + '/tests/VidMate/test_files/'
 else:
-    VIDMATE_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles/VidMate/'
+    VIDMATE_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/VidMate/'
 VIDMATE_DOWNLOAD_PATH: str = VIDMATE_PATH + 'download/'
 
 ## A) Emptying all folders apart from "download"
@@ -623,6 +653,9 @@ print(' B) "download"')
 print('  B.1) Renaming "download" file names')
 list_of_vid_paths = glob.glob(VIDMATE_DOWNLOAD_PATH + "/*.mp4")
 renamed_list_of_vid_paths = rename_files(list_of_vid_paths, VIDMATE_TYPE)
+if len(renamed_list_of_vid_paths) == 0:
+    RETURNED_MESSAGE += '\n • VidMate'
+    NB_EMPTY_FOLDERS += 1
 # B.2) Moving the files to the "Camera Uploads" folder
 print('  B.2) Moving the files to the "Camera Uploads" folder')
 move_files(renamed_list_of_vid_paths, CAMERA_UPLOADS_PATH)
@@ -631,14 +664,24 @@ move_files(renamed_list_of_vid_paths, CAMERA_UPLOADS_PATH)
 
 
 ## Launching final macOS X notification
-notify(title='dropsync_shift_rename.py',
-               subtitle='dropsync_shift_rename.py script run',
-               message='→ Files have been renamed and moved from DropsyncFiles to Camera Uploads!',
-               sound='Hero')
+if NB_EMPTY_FOLDERS > 0:
+    print(RETURNED_MESSAGE)
+
+if NB_EMPTY_FOLDERS == 10:
+    notify(title='dropsync_shift_rename.py',
+           subtitle='⚠️️ Process aborted!',
+           message='→ There are no files to move from DropsyncFiles to Camera Uploads!',
+           sound='Sosumi')
+else:
+    notify(title='dropsync_shift_rename.py',
+                   subtitle='🏆 Process successful!',
+                   message='→ Files have been renamed and moved from DropsyncFiles to Camera Uploads!',
+                   sound='Hero')
 
 
 
 
 ## Exiting the Terminal window in case the program has been triggered by Alfred
 # (Cf.: How do I close the Terminal in OSX from the command line? (https://superuser.com/questions/158375/how-do-i-close-the-terminal-in-osx-from-the-command-line/1385450))
-osascript.run('tell application "iTerm2" to close first window')
+if not DEBUG_MODE_ON:
+    osascript.run('tell application "iTerm2" to close first window')
