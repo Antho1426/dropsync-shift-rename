@@ -51,6 +51,11 @@ folder, where they are supposed to arrive in the case of an iPhone. It also
 takes care of removing unwanted files that I don't want to store, such as photos
 and videos that I have sent myself.
 
+Remark: the `Dropsync Shift and Rename` Alfred workflow implements the `dropsync_shift_rename.py` Python program. After
+  installing the [Alfred macOS app](https://www.alfredapp.com) and the `Dropsync Shift and Rename` workflow, simply type the `ds` hotkey in the Alfred search bar. The `dropsync_shift_rename.py` Python program is then
+  automatically triggered and runs in iTerm2.
+
+
 ## 2. Getting started
 
 ### 2.1 Dependencies
