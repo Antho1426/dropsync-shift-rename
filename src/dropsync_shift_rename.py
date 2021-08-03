@@ -66,7 +66,7 @@ CLOUD_MUSIC_TYPE: str = 'CLOUD_MUSIC'
 VIDMATE_TYPE: str = 'VidMate'
 WHATSAPP_SHORT: str = 'WA'
 DROPSYNCFILES_DIRECTORY_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles'
-CAMERA_UPLOADS_DIRECTORY_PATH: str = '/Users/anthony/Dropbox/Camera Uploads'
+CAMERA_UPLOADS_DIRECTORY_PATH: str = '/Users/anthony/Dropbox/Camera Uploads'
 RETURNED_MESSAGE: str = '\n⚠️ List of empty folders (i.e. that currently do not contain files to be moved):'
 NB_EMPTY_FOLDERS: int = 0
 
@@ -119,9 +119,9 @@ def move_files(files_path_list: list, dest_folder_path: str):
 
     for file_path in files_path_list:
         src_path = file_path
-        file_name = file_path.split('/')[-1]
-        dst_path = dest_folder_path + file_name
-        shutil.move(src_path, dst_path)
+        command = 'mv ' + src_path.replace(' ', '\ ') + ' ' + dest_folder_path.replace(' ', '\ ')
+        returned_value = os.system(command)
+        print("  mv 'returned_value': ", returned_value)  # prints "0" (this means that the command run successfully)
 
 
 def creation_date(file_path: str) -> float:
@@ -358,9 +358,9 @@ if DEBUG_MODE_ON:
     WHATSAPP_PROFILE_PHOTOS_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Profile Photos/test_files/'
 else:
     WHATSAPP_MISC_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/WhatsApp/MISC/'
-    WHATSAPP_WALLPAPER_PATH: str = '/WhatsApp/WallPaper/'
-    WHATSAPP_DOCUMENTS_PATH: str = '/WhatsApp/WhatsApp Documents/'
-    WHATSAPP_PROFILE_PHOTOS_PATH: str = '/WhatsApp/WhatsApp Profile Photos/'
+    WHATSAPP_WALLPAPER_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/WhatsApp/WallPaper/'
+    WHATSAPP_DOCUMENTS_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/WhatsApp/WhatsApp Documents/'
+    WHATSAPP_PROFILE_PHOTOS_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/WhatsApp/WhatsApp Profile Photos/'
 untargeted_folders_list = [
     WHATSAPP_MISC_PATH,
     WHATSAPP_WALLPAPER_PATH,
