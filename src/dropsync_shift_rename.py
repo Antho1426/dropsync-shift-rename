@@ -64,6 +64,7 @@ TELEGRAM_TYPE: str = 'Telegram'
 SNAPCHAT_TYPE: str = 'Snapchat'
 CLOUD_MUSIC_TYPE: str = 'CLOUD_MUSIC'
 VIDMATE_TYPE: str = 'VidMate'
+INSTANDER_TYPE: str = 'Instander'
 WHATSAPP_SHORT: str = 'WA'
 DROPSYNCFILES_DIRECTORY_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles'
 CAMERA_UPLOADS_DIRECTORY_PATH: str = '/Users/anthony/Dropbox/Camera Uploads'
@@ -117,11 +118,17 @@ def move_files(files_path_list: list, dest_folder_path: str):
                                 have to be moved.
     """
 
+    translation_dict = {
+        ' ': '\ ',
+        '(': '\(',
+        ')': '\)'
+    }
+
     for file_path in files_path_list:
         src_path = file_path
-        command = 'mv ' + src_path.replace(' ', '\ ') + ' ' + dest_folder_path.replace(' ', '\ ')
+        command = 'mv ' + src_path.translate(str.maketrans(translation_dict)) + ' ' + dest_folder_path.translate(str.maketrans(translation_dict))
         returned_value = os.system(command)
-        print("  mv 'returned_value': ", returned_value)  # prints "0" (this means that the command run successfully)
+        print("\tmv 'returned_value': ", returned_value)  # prints "0" (this means that the command run successfully)
 
 
 def creation_date(file_path: str) -> float:
@@ -231,6 +238,17 @@ def rename_files(list_of_file_paths: list, type: str) -> list:
                 renamed_list_of_file_paths.append(file_path_new)
                 os.rename(file_path, file_path_new)
 
+        elif type==INSTANDER_TYPE:
+            for file_path in list_of_file_paths:
+                file_date_long = ms_to_date(file_path)
+                file_date = file_date_long.split('_')[0]
+                instagram_name = file_path.split('/')[-2]
+                file_name = file_path.split('/')[-1]
+                file_number_and_extension = file_name.split('-')[-1]
+                file_path_new = parent_folder_path + file_date + UNDERSCORE_SIGN + instagram_name + UNDERSCORE_SIGN + file_number_and_extension
+                renamed_list_of_file_paths.append(file_path_new)
+                os.rename(file_path, file_path_new)
+
     else:
         print(colored('⚠️  Warning!\n', 'red'), '  The list of files to rename is empty!')
 
@@ -334,12 +352,12 @@ print('-----------')
 
 # Targeted folder paths
 if DEBUG_MODE_ON:
-    WHATSAPP_ANIMATED_GIFS_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Animated Gifs/test_files/'
-    WHATSAPP_AUDIO_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Audio/test_files/'
-    WHATSAPP_IMAGES_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Images/test_files/'
-    WHATSAPP_STICKERS_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Stickers/test_files/'
-    WHATSAPP_VIDEOS_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Video/test_files/'
-    WHATSAPP_VOICE_NOTES_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Voice Notes/test_files/'
+    WHATSAPP_ANIMATED_GIFS_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Animated Gifs/'
+    WHATSAPP_AUDIO_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Audio/'
+    WHATSAPP_IMAGES_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Images/'
+    WHATSAPP_STICKERS_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Stickers/'
+    WHATSAPP_VIDEOS_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Video/'
+    WHATSAPP_VOICE_NOTES_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Voice Notes/'
     CAMERA_UPLOADS_PATH: str = project_path + '/tests/Camera Uploads/'
 else:
     WHATSAPP_ANIMATED_GIFS_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/WhatsApp/WhatsApp Animated Gifs/'
@@ -352,10 +370,10 @@ else:
 
 # Untargeted folder paths
 if DEBUG_MODE_ON:
-    WHATSAPP_MISC_PATH: str = project_path + '/tests/WhatsApp/MISC/test_files/'
-    WHATSAPP_WALLPAPER_PATH: str = project_path + '/tests/WhatsApp/WallPaper/test_files/'
-    WHATSAPP_DOCUMENTS_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Documents/test_files/'
-    WHATSAPP_PROFILE_PHOTOS_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Profile Photos/test_files/'
+    WHATSAPP_MISC_PATH: str = project_path + '/tests/WhatsApp/MISC/'
+    WHATSAPP_WALLPAPER_PATH: str = project_path + '/tests/WhatsApp/WallPaper/'
+    WHATSAPP_DOCUMENTS_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Documents/'
+    WHATSAPP_PROFILE_PHOTOS_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Profile Photos/'
 else:
     WHATSAPP_MISC_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/WhatsApp/MISC/'
     WHATSAPP_WALLPAPER_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/WhatsApp/WallPaper/'
@@ -446,9 +464,10 @@ else:
 print(' D) "WhatsApp Audio"')
 if os.path.isdir(WHATSAPP_AUDIO_PATH):
     # D.1) Shifting all files from the "Sent" directory in the "WhatsApp Audio" directory
-    print('  D.1) Shifting all files from the "Sent" directory in the "WhatsApp Audio" directory')
-    files_in_sent = [WHATSAPP_AUDIO_PATH+SENT_FOLDER+SLASH_SIGN+f for f in listdir(WHATSAPP_AUDIO_PATH+SENT_FOLDER+SLASH_SIGN) if isfile(join(WHATSAPP_AUDIO_PATH+SENT_FOLDER+SLASH_SIGN, f))]
-    move_files(files_in_sent, WHATSAPP_AUDIO_PATH)
+    if os.path.isdir(WHATSAPP_AUDIO_PATH+SENT_FOLDER+SLASH_SIGN):
+        print('  D.1) Shifting all files from the "Sent" directory in the "WhatsApp Audio" directory')
+        files_in_sent = [WHATSAPP_AUDIO_PATH+SENT_FOLDER+SLASH_SIGN+f for f in listdir(WHATSAPP_AUDIO_PATH+SENT_FOLDER+SLASH_SIGN) if isfile(join(WHATSAPP_AUDIO_PATH+SENT_FOLDER+SLASH_SIGN, f))]
+        move_files(files_in_sent, WHATSAPP_AUDIO_PATH)
     # D.2) Getting all files in "WhatsApp Audio" directory (".opus", ".mp3", ".m4a", etc.)
     print('  D.2) Getting all files in "WhatsApp Audio" directory (".opus", ".mp3", ".m4a", etc.)')
     files_in_whatsapp_audio = [f for f in listdir(WHATSAPP_AUDIO_PATH) if isfile(join(WHATSAPP_AUDIO_PATH, f))]
@@ -541,7 +560,7 @@ print('\n2) Telegram')
 print('-----------')
 
 if DEBUG_MODE_ON:
-    TELEGRAM_PATH: str = project_path + '/tests/Telegram/test_files/'
+    TELEGRAM_PATH: str = project_path + '/tests/Telegram/'
 else:
     TELEGRAM_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/Telegram/'
 TELEGRAM_IMAGES_PATH: str = TELEGRAM_PATH + 'Telegram Images/'
@@ -582,7 +601,7 @@ print('\n3) Snapchat')
 print('-----------')
 
 if DEBUG_MODE_ON:
-    SNAPCHAT_PATH: str = project_path + '/tests/Snapchat/test_files/'
+    SNAPCHAT_PATH: str = project_path + '/tests/Snapchat/'
 else:
     SNAPCHAT_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/Snapchat/'
 
@@ -616,7 +635,7 @@ print('\n4) CLOUD_MUSIC')
 print('--------------')
 
 if DEBUG_MODE_ON:
-    CLOUD_MUSIC_PATH: str = project_path + '/tests/CLOUD_MUSIC/test_files'
+    CLOUD_MUSIC_PATH: str = project_path + '/tests/CLOUD_MUSIC/'
 else:
     CLOUD_MUSIC_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/CLOUD_MUSIC/'
 
@@ -651,7 +670,7 @@ print('\n5) VidMate')
 print('----------')
 
 if DEBUG_MODE_ON:
-    VIDMATE_PATH: str = project_path + '/tests/VidMate/test_files/'
+    VIDMATE_PATH: str = project_path + '/tests/VidMate/'
 else:
     VIDMATE_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/VidMate/'
 VIDMATE_DOWNLOAD_PATH: str = VIDMATE_PATH + 'download/'
@@ -677,6 +696,61 @@ if len(renamed_list_of_vid_paths) == 0:
 # B.2) Moving the files to the "Camera Uploads" folder
 print('  B.2) Moving the files to the "Camera Uploads" folder')
 move_files(renamed_list_of_vid_paths, CAMERA_UPLOADS_PATH)
+
+
+
+
+# ██╗███╗░░██╗░██████╗████████╗░█████╗░███╗░░██╗██████╗░███████╗██████╗░
+# ██║████╗░██║██╔════╝╚══██╔══╝██╔══██╗████╗░██║██╔══██╗██╔════╝██╔══██╗
+# ██║██╔██╗██║╚█████╗░░░░██║░░░███████║██╔██╗██║██║░░██║█████╗░░██████╔╝
+# ██║██║╚████║░╚═══██╗░░░██║░░░██╔══██║██║╚████║██║░░██║██╔══╝░░██╔══██╗
+# ██║██║░╚███║██████╔╝░░░██║░░░██║░░██║██║░╚███║██████╔╝███████╗██║░░██║
+# ╚═╝╚═╝░░╚══╝╚═════╝░░░░╚═╝░░░╚═╝░░╚═╝╚═╝░░╚══╝╚═════╝░╚══════╝╚═╝░░╚═╝
+## 6) Instander
+# (Instagram clone and image/video downloader Android app)
+print('\n6) Instander')
+print('------------')
+
+if DEBUG_MODE_ON:
+    INSTANDER_PATH: str = project_path + '/tests/Instander/'
+else:
+    INSTANDER_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/Instander/'
+
+## A) Visiting elements in "Instander" root folder
+print(' A) Visiting elements in "Instander" root folder')
+
+renamed_list_of_all_media_paths = []
+
+for file in os.listdir(INSTANDER_PATH):
+
+    elem_path = os.path.join(INSTANDER_PATH, file)
+
+    if os.path.isdir(elem_path):
+
+        # A.1) Navigating inside current subfolder
+        print('  A.1) Navigating inside current subfolder')
+        list_of_media_paths = [os.path.join(elem_path, media) for media in os.listdir(elem_path)]
+
+        # A.1.1) Renaming media file names (image and video)
+        print('   A.1.1) Renaming media file names (image and video)')
+        renamed_list_of_media_paths = rename_files(list_of_media_paths, INSTANDER_TYPE)
+        renamed_list_of_all_media_paths = renamed_list_of_all_media_paths + renamed_list_of_media_paths
+
+        # A.1.2) Moving the files to the "Camera Uploads" folder
+        print('   A.1.2) Moving the files to the "Camera Uploads" folder')
+        move_files(renamed_list_of_media_paths, CAMERA_UPLOADS_PATH)
+
+    else:
+        # A.2) Deleting image and video files at "Instander" folder root
+        # (Because those are the media I personally posted on Instagram)
+        # (Removing the file situated at "elem_path" since it is precisely a file
+        # (and hence NOT a subfolder))
+        print(' A.2) Deleting image and video files at "Instander" folder root')
+        os.remove(elem_path)
+
+if len(renamed_list_of_all_media_paths) == 0:
+    RETURNED_MESSAGE += '\n • Instander'
+    NB_EMPTY_FOLDERS += 1
 
 
 

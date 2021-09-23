@@ -5,5 +5,6 @@
 
 # Folders
 .idea
+old
 tests
 tests_save
