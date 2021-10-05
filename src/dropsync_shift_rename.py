@@ -76,7 +76,7 @@ NB_EMPTY_FOLDERS: int = 0
 
 ## Helper functions
 
-def notify(message, title, subtitle, sound):
+def notify(message: str, title: str, subtitle: str, sound: str):
     """
     Posts macOS X notification
 
