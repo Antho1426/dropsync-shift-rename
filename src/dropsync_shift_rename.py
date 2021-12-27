@@ -66,7 +66,7 @@ CLOUD_MUSIC_TYPE: str = 'CLOUD_MUSIC'
 VIDMATE_TYPE: str = 'VidMate'
 INSTANDER_TYPE: str = 'Instander'
 WHATSAPP_SHORT: str = 'WA'
-DROPSYNCFILES_DIRECTORY_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles'
+DROPSYNCFILES_DIRECTORY_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles/Media_UnidirectionalSync_AndroidToMac'
 CAMERA_UPLOADS_DIRECTORY_PATH: str = '/Users/anthony/Dropbox/Camera Uploads'
 RETURNED_MESSAGE: str = '\n⚠️ List of empty folders (i.e. that currently do not contain files to be moved):'
 NB_EMPTY_FOLDERS: int = 0
@@ -121,7 +121,10 @@ def move_files(files_path_list: list, dest_folder_path: str):
     translation_dict = {
         ' ': '\ ',
         '(': '\(',
-        ')': '\)'
+        ')': '\)',
+        '[': '\[',
+        ']': '\]',
+        '&': '\&'
     }
 
     for file_path in files_path_list:
@@ -536,8 +539,11 @@ if os.path.isdir(WHATSAPP_ANIMATED_GIFS_PATH):
     if len(renamed_list_of_anim_gifs_paths) == 0:
         RETURNED_MESSAGE += '\n • WhatsApp Animated Gifs'
         NB_EMPTY_FOLDERS += 1
-    # F.2) Moving the files to the "Camera Uploads" folder
-    print('  F.2) Moving the files to the "Camera Uploads" folder')
+    # F.2) Emptying "Sent" folder
+    print('  F.2) Emptying "Sent" folder')
+    empty_folder(WHATSAPP_ANIMATED_GIFS_PATH + SENT_FOLDER)
+    # F.3) Moving the files to the "Camera Uploads" folder
+    print('  F.3) Moving the files to the "Camera Uploads" folder')
     move_files(renamed_list_of_anim_gifs_paths, CAMERA_UPLOADS_PATH)
 else:
     NB_EMPTY_FOLDERS += 1
@@ -686,16 +692,35 @@ for folder in vidmate_directory_contents:
 
 ## B) "download"
 print(' B) "download"')
-# B.1) Renaming "download" file names
-print('  B.1) Renaming "download" file names')
-list_of_vid_paths = glob.glob(VIDMATE_DOWNLOAD_PATH + "/*.mp4")
-renamed_list_of_vid_paths = rename_files(list_of_vid_paths, VIDMATE_TYPE)
-if len(renamed_list_of_vid_paths) == 0:
-    RETURNED_MESSAGE += '\n • VidMate'
-    NB_EMPTY_FOLDERS += 1
-# B.2) Moving the files to the "Camera Uploads" folder
-print('  B.2) Moving the files to the "Camera Uploads" folder')
-move_files(renamed_list_of_vid_paths, CAMERA_UPLOADS_PATH)
+# Checking if the "download" folder exists
+if os.path.isdir(VIDMATE_DOWNLOAD_PATH):
+    # B.1) Renaming "download" file names
+    print('  B.1) Renaming "download" file names')
+    list_of_vid_paths = glob.glob(VIDMATE_DOWNLOAD_PATH + "/*.mp4")
+    list_of_aud_paths = glob.glob(VIDMATE_DOWNLOAD_PATH + "/*.mp3")
+    list_of_paths = list_of_vid_paths + list_of_aud_paths
+    renamed_list_of_paths = rename_files(list_of_paths, VIDMATE_TYPE)
+    if len(renamed_list_of_paths) == 0:
+        RETURNED_MESSAGE += '\n • VidMate'
+        NB_EMPTY_FOLDERS += 1
+    # B.2) Removing all the files with extension ".smi" and ".apk" from the "download" folder
+    print('  B.2) Removing all the files with extension ".smi" and ".apk" from the "download" folder')
+    # Gathering the path of all files in the "download" folder
+    file_paths_download_folder = []
+    for path in os.listdir(VIDMATE_DOWNLOAD_PATH):
+        full_path = os.path.join(VIDMATE_DOWNLOAD_PATH, path)
+        if os.path.isfile(full_path):
+            file_paths_download_folder.append(full_path)
+    # Deleting unwanted files from the "download" folder
+    extensions = ('.smi', '.apk')
+    for i in range(len(file_paths_download_folder)):
+        current_file_path = file_paths_download_folder[i]
+        ends_with_unwanted_extension = current_file_path.endswith(extensions)
+        if ends_with_unwanted_extension:
+            os.remove(current_file_path)
+    # B.3) Moving the files to the "Camera Uploads" folder
+    print('  B.3) Moving the files to the "Camera Uploads" folder')
+    move_files(renamed_list_of_paths, CAMERA_UPLOADS_PATH)
 
 
 
@@ -774,6 +799,15 @@ else:
 
 
 ## Exiting the Terminal window in case the program has been triggered by Alfred
+# and the folder "/Users/anthony/Dropbox/DropsyncFiles/Media_UnidirectionalSync_AndroidToMac"
+# (which path is stored in the variable "DROPSYNCFILES_DIRECTORY_PATH") has a size
+# of less than 1[MB]
+# Computing "Media_UnidirectionalSync_AndroidToMac" folder size
+num_bytes = sum([sum(map(lambda fname: os.path.getsize(os.path.join(directory, fname)), files)) for directory, folders, files in os.walk(DROPSYNCFILES_DIRECTORY_PATH)])
+num_mega_bytes = round(num_bytes/1e6,2)
 # (Cf.: How do I close the Terminal in OSX from the command line? (https://superuser.com/questions/158375/how-do-i-close-the-terminal-in-osx-from-the-command-line/1385450))
-if not DEBUG_MODE_ON:
+if not DEBUG_MODE_ON and num_mega_bytes<1:
     osascript.run('tell application "iTerm2" to close first window')
+else:
+    warning_message = colored('WARNING!', 'red', attrs=['reverse', 'blink'])
+    print(f'{warning_message} Something may have gone wrong. The size of the folder "Media_UnidirectionalSync_AndroidToMac" is not zero and amounts to {num_mega_bytes}[MB]!')
