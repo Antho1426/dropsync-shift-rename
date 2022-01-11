@@ -9,7 +9,7 @@
 
 
 #====================
-DEBUG_MODE_ON = False
+DEBUG_MODE_ON = True
 #====================
 
 
@@ -29,8 +29,8 @@ import os
 import glob
 import shutil
 import platform
-import osascript
-from PIL import Image
+import osascript # pip3 install osascript
+from PIL import Image # pip3 install Pillow
 from os import listdir
 from pathlib import Path
 from termcolor import colored
@@ -119,12 +119,13 @@ def move_files(files_path_list: list, dest_folder_path: str):
     """
 
     translation_dict = {
-        ' ': '\ ',
-        '(': '\(',
-        ')': '\)',
-        '[': '\[',
-        ']': '\]',
-        '&': '\&'
+        " ": "\ ",
+        "(": "\(",
+        ")": "\)",
+        "[": "\[",
+        "]": "\]",
+        "&": "\&",
+        "'": "\\'", # FIXME: check how to handle paths including apostrophe!
     }
 
     for file_path in files_path_list:
@@ -806,8 +807,9 @@ else:
 num_bytes = sum([sum(map(lambda fname: os.path.getsize(os.path.join(directory, fname)), files)) for directory, folders, files in os.walk(DROPSYNCFILES_DIRECTORY_PATH)])
 num_mega_bytes = round(num_bytes/1e6,2)
 # (Cf.: How do I close the Terminal in OSX from the command line? (https://superuser.com/questions/158375/how-do-i-close-the-terminal-in-osx-from-the-command-line/1385450))
-if not DEBUG_MODE_ON and num_mega_bytes<1:
-    osascript.run('tell application "iTerm2" to close first window')
-else:
-    warning_message = colored('WARNING!', 'red', attrs=['reverse', 'blink'])
-    print(f'{warning_message} Something may have gone wrong. The size of the folder "Media_UnidirectionalSync_AndroidToMac" is not zero and amounts to {num_mega_bytes}[MB]!')
+if not DEBUG_MODE_ON:
+    if num_mega_bytes<1:
+        osascript.run('tell application "iTerm2" to close first window')
+    else:
+        warning_message = colored('WARNING!', 'red', attrs=['reverse', 'blink'])
+        print(f'{warning_message} Something may have gone wrong. The size of the folder "Media_UnidirectionalSync_AndroidToMac" is not zero and amounts to {num_mega_bytes}[MB]!')
