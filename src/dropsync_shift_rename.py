@@ -9,7 +9,7 @@
 
 
 #====================
-DEBUG_MODE_ON = True
+DEBUG_MODE_ON = False
 #====================
 
 
@@ -33,21 +33,11 @@ import osascript # pip3 install osascript
 from PIL import Image # pip3 install Pillow
 from os import listdir
 from pathlib import Path
+from datetime import datetime
 from termcolor import colored
 from datetime import datetime
 from os.path import isfile, join
 from argparse import ArgumentParser
-
-
-
-
-## Parsing the input argument
-if not DEBUG_MODE_ON:
-    parser = ArgumentParser(description='"dropsync_shift_rename.py" is a Python\
-        program that automatically renames, moves and eventually converts any\
-        kind of files from the "DropsyncFiles" folder to the "Camera Uploads"\
-        folder.')
-    args = parser.parse_args()
 
 
 
@@ -76,9 +66,34 @@ NB_EMPTY_FOLDERS: int = 0
 
 ## Helper functions
 
+def copy_dir(dir_path):
+    """
+    Creates a copy of the directory in which media files are synced using
+    Dropsync Ultimate Android app.
+
+    Args:
+        dir_path (str): Source directory path in which media files are synced.
+    
+    Returns:
+        dir_path_dst (str): Destination directory path (i.e., directory holding
+                            the source directory copy).
+    """
+
+    # Computing current date
+    now = datetime.now()
+    dt_string = now.strftime("%Y-%m-%d_%H-%M-%S")
+    # Defining source and destination directories
+    dir_path_src = dir_path
+    dir_path_dst = dir_path_src + '_Copy_' + dt_string
+    # Copying source directory (and its entire content, including hidden files) to destination directory
+    shutil.copytree(dir_path_src, dir_path_dst, symlinks=False, ignore=None, copy_function=shutil.copy2, ignore_dangling_symlinks=False, dirs_exist_ok=False)
+
+    return dir_path_dst
+
+
 def notify(message: str, title: str, subtitle: str, sound: str):
     """
-    Posts macOS X notification
+    Posts macOS X notification.
 
     Args:
         message (str): The message
@@ -125,7 +140,7 @@ def move_files(files_path_list: list, dest_folder_path: str):
         "[": "\[",
         "]": "\]",
         "&": "\&",
-        "'": "\\'", # FIXME: check how to handle paths including apostrophe!
+        "'": "\\'", # handling paths including apostrophe
     }
 
     for file_path in files_path_list:
@@ -329,6 +344,22 @@ def convert_to_mp3(list_of_audio_paths: list) -> list:
         print(colored('⚠️  Warning!\n', 'red'), '  The list of files to convert to ".mp3" is empty!')
 
     return list_of_audio_paths_mp3
+
+
+
+
+## Parsing the input argument
+if not DEBUG_MODE_ON:
+    # Creating ArgumentParser
+    parser = ArgumentParser(description='"dropsync_shift_rename.py" is a Python\
+        program that automatically renames, moves and eventually converts any\
+        kind of files from the "DropsyncFiles" folder to the "Camera Uploads"\
+        folder.')
+    args = parser.parse_args()
+    # Copying directory content (in order to keep all synchronised files intact
+    # in order to be able to identify where the error came from in the event
+    # that an error has occurred during the execution of the program below)
+    DROPSYNCFILES_DIRECTORY_PATH_COPY = copy_dir(DROPSYNCFILES_DIRECTORY_PATH)
 
 
 
@@ -799,10 +830,11 @@ else:
 
 
 
-## Exiting the Terminal window in case the program has been triggered by Alfred
-# and the folder "/Users/anthony/Dropbox/DropsyncFiles/Media_UnidirectionalSync_AndroidToMac"
-# (which path is stored in the variable "DROPSYNCFILES_DIRECTORY_PATH") has a size
-# of less than 1[MB]
+## Exiting the Terminal window (using AppleScript command) in case the program
+# has been triggered by Alfred and the folder "/Users/anthony/Dropbox/DropsyncFiles/Media_UnidirectionalSync_AndroidToMac"
+# (which path is stored in the variable "DROPSYNCFILES_DIRECTORY_PATH" and
+# which corresonds to the directory in which media files are synced) has a size
+# of less than 1[MB] (meaning that the program hence run successfully)
 # Computing "Media_UnidirectionalSync_AndroidToMac" folder size
 num_bytes = sum([sum(map(lambda fname: os.path.getsize(os.path.join(directory, fname)), files)) for directory, folders, files in os.walk(DROPSYNCFILES_DIRECTORY_PATH)])
 num_mega_bytes = round(num_bytes/1e6,2)
@@ -810,6 +842,15 @@ num_mega_bytes = round(num_bytes/1e6,2)
 if not DEBUG_MODE_ON:
     if num_mega_bytes<1:
         osascript.run('tell application "iTerm2" to close first window')
+        # Removing copy of directory in whch media files are synced only if the
+        # program run successfully (this way, if there was a problem in the
+        # execution of the program, the original structure of the directory in
+        # which media files are synced remains saved for further investigations)
+        shutil.rmtree(DROPSYNCFILES_DIRECTORY_PATH_COPY)
     else:
         warning_message = colored('WARNING!', 'red', attrs=['reverse', 'blink'])
-        print(f'{warning_message} Something may have gone wrong. The size of the folder "Media_UnidirectionalSync_AndroidToMac" is not zero and amounts to {num_mega_bytes}[MB]!')
+        print(f'{warning_message} Something may have gone wrong. The size of the \
+                folder "Media_UnidirectionalSync_AndroidToMac" is not zero and amounts \
+                to {num_mega_bytes}[MB]! Note that a copy of the original structure \
+                of the directory in which media files are synced has been saved \
+                at the same location on the computer for further investigations.')
