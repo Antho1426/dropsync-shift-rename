@@ -807,15 +807,31 @@ for file in os.listdir(INSTANDER_PATH):
         list_of_media_paths = [os.path.join(
             elem_path, media) for media in os.listdir(elem_path)]
 
-        # A.1.1) Renaming media file names (image and video)
-        print('   A.1.1) Renaming media file names (image and video)')
+        # A.1.1) Converting any ".webp" files to ".png" files
+        print('   A.1.1) Converting any ".webp" files to ".png" files')
+        list_of_media_paths_with_potential_webp = list_of_media_paths
+        list_of_media_paths = []
+        for media_path in list_of_media_paths_with_potential_webp:
+            if media_path[-5:] == '.webp':
+                # Converting from ".webp" to "png"
+                im = Image.open(media_path).convert('RGBA')
+                media_path_png = media_path[:-5]+'.png'
+                im.save(media_path_png, 'png')
+                # Deleting ".webp" file
+                os.remove(media_path)
+                # Updating media_path
+                media_path = media_path_png
+            list_of_media_paths.append(media_path)
+
+        # A.1.2) Renaming media file names (image and video)
+        print('   A.1.2) Renaming media file names (image and video)')
         renamed_list_of_media_paths = rename_files(
             list_of_media_paths, INSTANDER_TYPE)
         renamed_list_of_all_media_paths = renamed_list_of_all_media_paths + \
             renamed_list_of_media_paths
 
-        # A.1.2) Moving the files to the "Camera Uploads" folder
-        print('   A.1.2) Moving the files to the "Camera Uploads" folder')
+        # A.1.3) Moving the files to the "Camera Uploads" folder
+        print('   A.1.3) Moving the files to the "Camera Uploads" folder')
         move_files(renamed_list_of_media_paths, CAMERA_UPLOADS_PATH)
 
     else:
