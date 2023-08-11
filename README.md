@@ -55,11 +55,11 @@ Dropsync Ultimate:
 | [WhatsApp](https://play.google.com/store/apps/details?id=com.whatsapp)                            | /storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media | Dropbox/DropsyncFiles/Media_UnidirectionalSync_AndroidToMac/WhatsApp    |
 | [Telegram](https://play.google.com/store/apps/details?id=org.telegram.messenger)                  | /storage/emulated/0/Telegram                                  | Dropbox/DropsyncFiles/Media_UnidirectionalSync_AndroidToMac/Telegram    |
 | [Snapchat](https://play.google.com/store/apps/details?id=com.snapchat.android)                    | /storage/emulated/0/Snapchat                                  | Dropbox/DropsyncFiles/Media_UnidirectionalSync_AndroidToMac/Snapchat    |
-| [Download Music Mp3](https://play.google.com/store/apps/details?id=com.music.downloadfreeapp4you) | /storage/emulated/0/CLOUD_MUSIC                               | Dropbox/DropsyncFiles/Media_UnidirectionalSync_AndroidToMac/CLOUD_MUSIC |
-| [VidMate](https://www.vidmateapp.com)                                                             | /storage/emulated/0/VidMate                                   | Dropbox/DropsyncFiles/Media_UnidirectionalSync_AndroidToMac/VidMate     |
+| [Download Music Mp3](https://play.google.com/store/apps/details?id=com.music.downloadfreeapp4you) | /storage/emulated/0/Download/MusicDownload                               | Dropbox/DropsyncFiles/Media_UnidirectionalSync_AndroidToMac/MusicDownload |
+| [TubeMate 3](https://download.cnet.com/TubeMate-3/3000-2071_4-77669412.html)                                                             | /storage/emulated/0/VidMate                                   | Dropbox/DropsyncFiles/Media_UnidirectionalSync_AndroidToMac/VidMate     |
 | [Instander](https://thedise.me/instander/)                                                        | /storage/emulated/0/Pictures/Instander                        | Dropbox/DropsyncFiles/Media_UnidirectionalSync_AndroidToMac/Instander   |
 
-> Note: *VidMate* can be used to download YouTube videos in both ".mp4" and ".mp3"
+> Note: *TubeMate 3* (the successor to *VidMate*) can be used to download YouTube videos in both ".mp4" and ".mp3"
 formats. This is the reason why *Download Music Mp3* tends to be less used because
 this app only allows to download YouTube videos in ".mp3" format.
 

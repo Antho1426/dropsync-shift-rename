@@ -16,9 +16,9 @@ from pathlib import Path
 
 import osascript  # pip3 install osascript
 from PIL import Image  # pip3 install Pillow
-# ====================
 from termcolor import colored
 
+# ====================
 DEBUG_MODE_ON = False
 # ====================
 
@@ -44,7 +44,7 @@ PRIVATE_FOLDER: str = 'Private'
 WHATSAPP_TYPE: str = 'WhatsApp'
 TELEGRAM_TYPE: str = 'Telegram'
 SNAPCHAT_TYPE: str = 'Snapchat'
-CLOUD_MUSIC_TYPE: str = 'CLOUD_MUSIC'
+MUSIC_DOWNLOAD_TYPE: str = 'MusicDownload'
 VIDMATE_TYPE: str = 'VidMate'
 INSTANDER_TYPE: str = 'Instander'
 WHATSAPP_SHORT: str = 'WA'
@@ -249,7 +249,7 @@ def rename_files(list_of_file_paths: list, type: str) -> list:
                 renamed_list_of_file_paths.append(file_path_new)
                 os.rename(file_path, file_path_new)
 
-        elif type == VIDMATE_TYPE or type == CLOUD_MUSIC_TYPE:
+        elif type == VIDMATE_TYPE or type == MUSIC_DOWNLOAD_TYPE:
             for file_path in list_of_file_paths:
                 file_date_long = ms_to_date(file_path)
                 file_date = file_date_long.split('.')[0]
@@ -683,32 +683,33 @@ print(' B) Moving the files to the "Camera Uploads" folder')
 move_files(renamed_list_of_file_paths, CAMERA_UPLOADS_PATH)
 
 
-# ░█████╗░██╗░░░░░░█████╗░██╗░░░██╗██████╗░░░░░░░░░░░███╗░░░███╗██╗░░░██╗░██████╗██╗░█████╗░
-# ██╔══██╗██║░░░░░██╔══██╗██║░░░██║██╔══██╗░░░░░░░░░░████╗░████║██║░░░██║██╔════╝██║██╔══██╗
-# ██║░░╚═╝██║░░░░░██║░░██║██║░░░██║██║░░██║░░░░░░░░░░██╔████╔██║██║░░░██║╚█████╗░██║██║░░╚═╝
-# ██║░░██╗██║░░░░░██║░░██║██║░░░██║██║░░██║░░░░░░░░░░██║╚██╔╝██║██║░░░██║░╚═══██╗██║██║░░██╗
-# ╚█████╔╝███████╗╚█████╔╝╚██████╔╝██████╔╝░░░░░░░░░░██║░╚═╝░██║╚██████╔╝██████╔╝██║╚█████╔╝
-# ░╚════╝░╚══════╝░╚════╝░░╚═════╝░╚═════╝░██████████╚═╝░░░░░╚═╝░╚═════╝░╚═════╝░╚═╝░╚════╝░
-# 4) CLOUD_MUSIC
+# ███╗░░░███╗██╗░░░██╗░██████╗██╗░█████╗░██████╗░░█████╗░░██╗░░░░░░░██╗███╗░░██╗██╗░░░░░░█████╗░░█████╗░██████╗░
+# ████╗░████║██║░░░██║██╔════╝██║██╔══██╗██╔══██╗██╔══██╗░██║░░██╗░░██║████╗░██║██║░░░░░██╔══██╗██╔══██╗██╔══██╗
+# ██╔████╔██║██║░░░██║╚█████╗░██║██║░░╚═╝██║░░██║██║░░██║░╚██╗████╗██╔╝██╔██╗██║██║░░░░░██║░░██║███████║██║░░██║
+# ██║╚██╔╝██║██║░░░██║░╚═══██╗██║██║░░██╗██║░░██║██║░░██║░░████╔═████║░██║╚████║██║░░░░░██║░░██║██╔══██║██║░░██║
+# ██║░╚═╝░██║╚██████╔╝██████╔╝██║╚█████╔╝██████╔╝╚█████╔╝░░╚██╔╝░╚██╔╝░██║░╚███║███████╗╚█████╔╝██║░░██║██████╔╝
+# ╚═╝░░░░░╚═╝░╚═════╝░╚═════╝░╚═╝░╚════╝░╚═════╝░░╚════╝░░░░╚═╝░░░╚═╝░░╚═╝░░╚══╝╚══════╝░╚════╝░╚═╝░░╚═╝╚═════╝░
+# 4) MusicDownload
 # (YouTube video to mp3 converter Android app)
-print('\n4) CLOUD_MUSIC')
+print('\n4) MusicDownload')
 print('--------------')
 
 if DEBUG_MODE_ON:
-    CLOUD_MUSIC_PATH: str = project_path + '/tests/CLOUD_MUSIC/'
+    MUSIC_DOWNLOAD_PATH: str = project_path + '/tests/MusicDownload/'
 else:
-    CLOUD_MUSIC_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/CLOUD_MUSIC/'
+    MUSIC_DOWNLOAD_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/MusicDownload/'
 
 # A) Converting the audio files from ".m4a" to ".mp3"
 print(' A) Converting the audio files from ".m4a" to ".mp3"')
-list_of_audio_paths = glob.glob(CLOUD_MUSIC_PATH + "/*.m4a")
+list_of_audio_paths = glob.glob(MUSIC_DOWNLOAD_PATH + "/*.m4a")
 list_of_files_mp3 = convert_to_mp3(list_of_audio_paths)
 
 # B) Renaming the audio files
 print(' B) Renaming the audio files')
-renamed_list_of_mp3_paths = rename_files(list_of_files_mp3, CLOUD_MUSIC_TYPE)
+renamed_list_of_mp3_paths = rename_files(
+    list_of_files_mp3, MUSIC_DOWNLOAD_TYPE)
 if len(renamed_list_of_mp3_paths) == 0:
-    RETURNED_MESSAGE += '\n • CLOUD_MUSIC'
+    RETURNED_MESSAGE += '\n • MUSIC_DOWNLOAD'
     NB_EMPTY_FOLDERS += 1
 
 # C) Moving the files to the "Camera Uploads" folder
