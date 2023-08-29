@@ -701,11 +701,15 @@ else:
 
 # A) Converting the audio files from ".m4a" to ".mp3"
 print(' A) Converting the audio files from ".m4a" to ".mp3"')
-list_of_audio_paths = glob.glob(MUSIC_DOWNLOAD_PATH + "/*.m4a")
-list_of_files_mp3 = convert_to_mp3(list_of_audio_paths)
+list_of_audio_paths_m4a = glob.glob(MUSIC_DOWNLOAD_PATH + "/*.m4a")
+list_of_files_mp3_converted = convert_to_mp3(list_of_audio_paths_m4a)
 
-# B) Renaming the audio files
-print(' B) Renaming the audio files')
+# B) Making list of converted ".mp3" files and original ".mp3" files
+print(' B) Making list of converted ".mp3" files and original ".mp3" files')
+list_of_files_mp3 = glob.glob(MUSIC_DOWNLOAD_PATH + "/*.mp3")
+
+# C) Renaming the audio files
+print(' C) Renaming the audio files')
 renamed_list_of_mp3_paths = rename_files(
     list_of_files_mp3, MUSIC_DOWNLOAD_TYPE)
 if len(renamed_list_of_mp3_paths) == 0:
