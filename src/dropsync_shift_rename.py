@@ -218,10 +218,12 @@ def rename_files(list_of_file_paths: list, type: str) -> list:
 
         if type == WHATSAPP_TYPE:
             for file_path in list_of_file_paths:
-                if not file_path.split('/')[-1][0].isdigit():
+                file_name = file_path.split('/')[-1]
+                file_category = file_name.split('-')[0]
+                if not file_name[0].isdigit():
                     file_date = ms_to_date(file_path)
-                    file_num = file_path.split(
-                        '/')[-1].split('-')[2].replace(WHATSAPP_SHORT, WHATSAPP_TYPE + UNDERSCORE_SIGN)
+                    file_num = file_name.split(
+                        '-')[2].replace(WHATSAPP_SHORT, WHATSAPP_TYPE+UNDERSCORE_SIGN+file_category+UNDERSCORE_SIGN)
                     file_path_new = parent_folder_path + file_date + UNDERSCORE_SIGN + file_num
                     renamed_list_of_file_paths.append(file_path_new)
                     os.rename(file_path, file_path_new)
