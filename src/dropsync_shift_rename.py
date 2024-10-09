@@ -397,6 +397,8 @@ if DEBUG_MODE_ON:
     WHATSAPP_VIDEOS_PATH: str = project_path + '/tests/WhatsApp/WhatsApp Video/'
     WHATSAPP_VOICE_NOTES_PATH: str = project_path + \
         '/tests/WhatsApp/WhatsApp Voice Notes/'
+    WHATSAPP_VIDEO_NOTES_PATH: str = project_path + \
+        '/tests/WhatsApp/WhatsApp Video Notes/'
     CAMERA_UPLOADS_PATH: str = project_path + '/tests/Camera Uploads/'
 else:
     WHATSAPP_ANIMATED_GIFS_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + \
@@ -409,6 +411,8 @@ else:
     WHATSAPP_VIDEOS_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/WhatsApp/WhatsApp Video/'
     WHATSAPP_VOICE_NOTES_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + \
         '/WhatsApp/WhatsApp Voice Notes/'
+    WHATSAPP_VIDEO_NOTES_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + \
+        '/WhatsApp/WhatsApp Video Notes/'
     CAMERA_UPLOADS_PATH: str = CAMERA_UPLOADS_DIRECTORY_PATH
 
 # Untargeted folder paths
@@ -608,7 +612,37 @@ if os.path.isdir(WHATSAPP_ANIMATED_GIFS_PATH):
 else:
     NB_EMPTY_FOLDERS += 1
 
-# G) Empty untargeted folders
+# G) "WhatsApp Video Notes"
+print(' G) "WhatsApp Video Notes"')
+if os.path.isdir(WHATSAPP_VIDEO_NOTES_PATH):
+    # G.1) Gathering all (".mp4") files of the different subfolders
+    print('  G.1) Gathering all (".mp4") files of the different subfolders')
+    list_of_files_in_subfolders = get_list_of_files(WHATSAPP_VIDEO_NOTES_PATH)
+    # G.2) Moving all (".mp4") files at the root of the "WhatsApp Video Notes" folder
+    print('  G.2) Moving all (".mp4") files at the root of the "WhatsApp Video Notes" folder')
+    move_files(list_of_files_in_subfolders, WHATSAPP_VIDEO_NOTES_PATH)
+    # G.3) Deleting the emptied folders
+    print('  G.3) Deleting the emptied folders')
+    folders_list = [WHATSAPP_VIDEO_NOTES_PATH+f for f in os.listdir(
+        WHATSAPP_VIDEO_NOTES_PATH) if os.path.isdir(WHATSAPP_VIDEO_NOTES_PATH+f)]
+    for f in folders_list:
+        os.rmdir(f)
+    # G.4) Renaming "WhatsApp Video Notes" file names
+    print('  G.4) Renaming "WhatsApp Video Notes" file names')
+    list_of_files_in_whatsapp_video_notes = [
+        '/'.join(f.split('/')[:-2])+SLASH_SIGN+f.split('/')[-1] for f in list_of_files_in_subfolders]
+    renamed_list_of_files = rename_files(
+        list_of_files_in_whatsapp_video_notes, WHATSAPP_TYPE)
+    if len(renamed_list_of_files) == 0:
+        RETURNED_MESSAGE += '\n • WhatsApp Video Notes'
+        NB_EMPTY_FOLDERS += 1
+    # G.6) Moving the files to the "Camera Uploads" folder
+    print('  G.6) Moving the files to the "Camera Uploads" folder')
+    move_files(renamed_list_of_files, CAMERA_UPLOADS_PATH)
+else:
+    NB_EMPTY_FOLDERS += 1
+
+# H) Empty untargeted folders
 for folder_path in untargeted_folders_list:
     empty_folder(folder_path)
 
