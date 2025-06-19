@@ -47,6 +47,7 @@ SNAPCHAT_TYPE: str = 'Snapchat'
 MUSIC_DOWNLOAD_TYPE: str = 'MusicDownload'
 VIDMATE_TYPE: str = 'VidMate'
 INSTANDER_TYPE: str = 'Instander'
+STORYSAVER_TYPE: str = 'StorySaver'
 WHATSAPP_SHORT: str = 'WA'
 DROPSYNCFILES_DIRECTORY_PATH: str = '/Users/anthony/Dropbox/DropsyncFiles/Media_UnidirectionalSync_AndroidToMac'
 CAMERA_UPLOADS_DIRECTORY_PATH: str = '/Users/anthony/Dropbox/Camera Uploads'
@@ -272,6 +273,17 @@ def rename_files(list_of_file_paths: list, type: str) -> list:
                 renamed_list_of_file_paths.append(file_path_new)
                 os.rename(file_path, file_path_new)
 
+        elif type == STORYSAVER_TYPE:
+            for file_path in list_of_file_paths:
+                file_date_long = ms_to_date(file_path)
+                file_date = file_date_long.split('_')[0]
+                storysaver_name = file_path.split('/')[-2]
+                file_name = file_path.split('/')[-1]
+                file_path_new = parent_folder_path + file_date + UNDERSCORE_SIGN + \
+                    storysaver_name + UNDERSCORE_SIGN + file_name
+                renamed_list_of_file_paths.append(file_path_new)
+                os.rename(file_path, file_path_new)
+
     else:
         print(colored('⚠️  Warning!\n', 'red'),
               '  The list of files to rename is empty!')
@@ -377,6 +389,7 @@ notify(title='dropsync_shift_rename.py',
        message='→ Renaming and moving process started...',
        sound='Blow')
 
+# ------------------------------------------------------------------------------
 
 # ░██╗░░░░░░░██╗██╗░░██╗░█████╗░████████╗░██████╗░█████╗░██████╗░██████╗░
 # ░██║░░██╗░░██║██║░░██║██╔══██╗╚══██╔══╝██╔════╝██╔══██╗██╔══██╗██╔══██╗
@@ -887,6 +900,45 @@ if len(renamed_list_of_all_media_paths) == 0:
     RETURNED_MESSAGE += '\n • Instander'
     NB_EMPTY_FOLDERS += 1
 
+
+# ░██████╗████████╗░█████╗░██████╗░██╗░░░██╗  ░██████╗░█████╗░██╗░░░██╗███████╗██████╗░
+# ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚██╗░██╔╝  ██╔════╝██╔══██╗██║░░░██║██╔════╝██╔══██╗
+# ╚█████╗░░░░██║░░░██║░░██║██████╔╝░╚████╔╝░  ╚█████╗░███████║╚██╗░██╔╝█████╗░░██████╔╝
+# ░╚═══██╗░░░██║░░░██║░░██║██╔══██╗░░╚██╔╝░░  ░╚═══██╗██╔══██║░╚████╔╝░██╔══╝░░██╔══██╗
+# ██████╔╝░░░██║░░░╚█████╔╝██║░░██║░░░██║░░░  ██████╔╝██║░░██║░░╚██╔╝░░███████╗██║░░██║
+# ╚═════╝░░░░╚═╝░░░░╚════╝░╚═╝░░╚═╝░░░╚═╝░░░  ╚═════╝░╚═╝░░╚═╝░░░╚═╝░░░╚══════╝╚═╝░░╚═╝
+# 7) Story Saver
+# (Android app for downloading WhatsApp stories under the form of JPG and MP4 files)
+print('\n7) Story Saver')
+print('------------')
+
+if DEBUG_MODE_ON:
+    STORYSAVER_PATH: str = project_path + '/tests/StorySaver/'
+else:
+    STORYSAVER_PATH: str = DROPSYNCFILES_DIRECTORY_PATH + '/StorySaver/'
+
+# A) Visiting elements in "StorySaver" root folder
+print(' A) Visiting elements in "StorySaver" root folder')
+
+patterns = ["*.jpg", "*.mp4"]
+list_of_media_paths = []
+for pattern in patterns:
+    list_of_media_paths.extend(glob.glob(os.path.join(STORYSAVER_PATH, "**", pattern), recursive=True))
+
+# A.1.1) Renaming media file names (image and video)
+print('   A.1.2) Renaming media file names (image and video)')
+renamed_list_of_media_paths = rename_files(
+    list_of_media_paths, STORYSAVER_TYPE)
+
+# A.1.2) Moving the files to the "Camera Uploads" folder
+print('   A.1.3) Moving the files to the "Camera Uploads" folder')
+move_files(renamed_list_of_media_paths, CAMERA_UPLOADS_PATH)
+
+if len(renamed_list_of_media_paths) == 0:
+    RETURNED_MESSAGE += '\n • Story Saver'
+    NB_EMPTY_FOLDERS += 1
+
+# ------------------------------------------------------------------------------
 
 # Launching final macOS X notification
 if NB_EMPTY_FOLDERS > 0:
